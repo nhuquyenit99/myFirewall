@@ -1,35 +1,64 @@
 import java.io.*;
-import javax.swing.JOptionPane;
 
 public class UFWShellCommand {
     String rootPassword;
-    public UFWShellCommand (String password) {
+
+    public UFWShellCommand(String password) {
         this.rootPassword = password;
     }
+
     public void enableFireWall() {
-        command("ufw enable");
+        command("sudo ufw enable");
     }
+
     public void disabelFireWall() {
-        command("ufw disable");
+        command("sudo ufw disable");
     }
+
     public String getStatus() {
         try {
-            String[] cmd = { "/bin/bash", "-c", "echo "+ this.rootPassword + "| sudo -S ufw status"};
+            String[] cmd = { "/bin/bash", "-c", "echo " + this.rootPassword + "| sudo -S ufw status" };
             Process pb = Runtime.getRuntime().exec(cmd);
 
             BufferedReader input = new BufferedReader(new InputStreamReader(pb.getInputStream()));
             String line = input.readLine();
-            String status = line.split( ": ")[1];
+            String status = line.split(": ")[1];
             return status;
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Something went wrong!", "Warning", JOptionPane.WARNING_MESSAGE);
-            return null;
+            return "";
         }
     }
-    public void command(String command){
+
+    public String[] getDefaultRules() {
+        String[] defaultRules = new String[2];
         try {
-            String[] cmd = { "/bin/bash", "-c", "echo "+ this.rootPassword + "| sudo -S " + command };
-            Process pb = Runtime.getRuntime().exec("sudo " + cmd);
+            String[] cmd = { "/bin/bash", "-c", "echo " + this.rootPassword + "| sudo -S ufw status verbose" };
+            Process pb = Runtime.getRuntime().exec(cmd);
+
+            BufferedReader input = new BufferedReader(new InputStreamReader(pb.getInputStream()));
+            String line;
+            int i = 0;
+            while ((line = input.readLine()) != null && i < 2) {
+                i++;
+            }
+            System.out.println("default: " + line);
+            String[] words = line.split("[: (),]");
+            defaultRules[0] = words[2];
+            defaultRules[1] = words[7];
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return defaultRules;
+    }
+
+    public void setDefaultRule(String direction, String policy) {
+        command("sudo ufw default " + policy + " " + direction);
+    }
+
+    public void command(String command) {
+        try {
+            Process pb = Runtime.getRuntime().exec(command);
 
             String line;
             BufferedReader input = new BufferedReader(new InputStreamReader(pb.getInputStream()));
@@ -39,7 +68,7 @@ public class UFWShellCommand {
             pb.destroy();
         } catch (IOException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Something went wrong!", "Warning", JOptionPane.WARNING_MESSAGE);
         }
     }
+
 }

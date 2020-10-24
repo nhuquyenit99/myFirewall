@@ -1,4 +1,5 @@
 import java.io.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.*;
@@ -12,6 +13,9 @@ public class MyFirewall extends JFrame implements ActionListener {
     JComboBox<String> incomeStatusComboBox;
     JComboBox<String> outgoingStatusComboBox;
     String[] rules;
+    boolean isUfwActive;
+    String incomePolicy;
+    String outgoingPolicy;
     JButton addRuleBtn;
     JButton removeButton;
     JButton removeAllButton;
@@ -25,7 +29,23 @@ public class MyFirewall extends JFrame implements ActionListener {
     }
 
     public MyFirewall(String password) {
-        this.ufwShellCommand = new UFWShellCommand(password);
+        ufwShellCommand = new UFWShellCommand(password);
+        System.out.println("status: " + ufwShellCommand.getStatus());
+        if (ufwShellCommand.getStatus().toString().equals("active")) {
+            isUfwActive = true;
+            String[] str = ufwShellCommand.getDefaultRules();
+            System.out.println(str[0] + str[1]);
+            incomePolicy=str[0];
+            outgoingPolicy=str[1];
+        } else {
+            ufwShellCommand.enableFireWall();
+            String[] str = ufwShellCommand.getDefaultRules();
+            System.out.println(str[0] + str[1]);
+            incomePolicy=str[0];
+            outgoingPolicy=str[1];
+            ufwShellCommand.disabelFireWall();
+            isUfwActive = false;
+        }
         this.GUI();
     }
 
@@ -59,22 +79,74 @@ public class MyFirewall extends JFrame implements ActionListener {
         statusComboBox.setFont(new Font("TimesRoman", Font.PLAIN, 14));
         statusComboBox.setBounds(130, 60, 100, 30);
         statusComboBox.addActionListener(this);
-        statusComboBox.setSelectedIndex(0);
-
+        if (isUfwActive) {
+            statusComboBox.setSelectedIndex(0);
+        } else {
+            statusComboBox.setSelectedIndex(1);
+        }
         this.add(statusComboBox);
+        statusComboBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                if (statusComboBox.getSelectedIndex() != -1) {
+                    String data = statusComboBox.getItemAt(statusComboBox.getSelectedIndex());
+                    if (data == "On") {
+                        ufwShellCommand.enableFireWall();
+                        isUfwActive = true;
+                        incomeStatusComboBox.setEnabled(true);
+                        outgoingStatusComboBox.setEnabled(true);
+                        addRuleBtn.setEnabled(true);
+                        removeButton.setEnabled(true);
+                        removeAllButton.setEnabled(true);
+                    }
+                    if (data == "Off") {
+                        ufwShellCommand.disabelFireWall();
+                        isUfwActive = false;
+                        incomeStatusComboBox.setEnabled(false);
+                        outgoingStatusComboBox.setEnabled(false);
+                        addRuleBtn.setEnabled(false);
+                        removeButton.setEnabled(false);
+                        removeAllButton.setEnabled(false);
+                    }
+                }
+            }
+        });
 
         JLabel incomeLabel = new JLabel("Incoming: ");
         incomeLabel.setFont(new Font("TimesRoman", Font.BOLD, 16));
         incomeLabel.setBounds(20, 100, 100, 30);
         this.add(incomeLabel);
 
-        String[] s2 = { "Allow", "Deny" };
-        JComboBox<String> incomeStatusComboBox = new JComboBox<String>(s2);
+        String[] s2 = { "Allow", "Deny", "Reject" };
+        incomeStatusComboBox = new JComboBox<String>(s2);
         incomeStatusComboBox.setFont(new Font("TimesRoman", Font.PLAIN, 14));
         incomeStatusComboBox.setBounds(130, 100, 100, 30);
         incomeStatusComboBox.addActionListener(this);
-        incomeStatusComboBox.setSelectedIndex(1);
-
+        if (incomePolicy.equals("allow")) {
+            incomeStatusComboBox.setSelectedIndex(0);
+        } else {
+            if (incomePolicy.equals("deny")) {
+                incomeStatusComboBox.setSelectedIndex(1);
+            }
+            else {
+                incomeStatusComboBox.setSelectedIndex(2);
+            }
+        }
+        incomeStatusComboBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                if (incomeStatusComboBox.getSelectedIndex() != -1) {
+                    String data = incomeStatusComboBox.getItemAt(incomeStatusComboBox.getSelectedIndex());
+                    if (data.equals("Allow")) {
+                        ufwShellCommand.setDefaultRule("incoming", "allow");
+                    }
+                    if (data.equals("Deny")) {
+                        ufwShellCommand.setDefaultRule("incoming", "deny");
+                    }
+                    if (data.equals("Reject")) {
+                        ufwShellCommand.setDefaultRule("incoming", "reject");
+                    }
+                }
+            }
+        });
         this.add(incomeStatusComboBox);
 
         JLabel outgoingLabel = new JLabel("Outgoing: ");
@@ -82,12 +154,37 @@ public class MyFirewall extends JFrame implements ActionListener {
         outgoingLabel.setBounds(20, 140, 100, 30);
         this.add(outgoingLabel);
 
-        JComboBox<String> outgoingStatusComboBox = new JComboBox<String>(s2);
+        outgoingStatusComboBox = new JComboBox<String>(s2);
         outgoingStatusComboBox.setFont(new Font("TimesRoman", Font.PLAIN, 14));
         outgoingStatusComboBox.setBounds(130, 140, 100, 30);
         outgoingStatusComboBox.addActionListener(this);
-        incomeStatusComboBox.setSelectedIndex(0);
-
+        if (outgoingPolicy.equals("allow")) {
+            outgoingStatusComboBox.setSelectedIndex(0);
+        } else {
+            if (outgoingPolicy.equals("deny")) {
+                outgoingStatusComboBox.setSelectedIndex(1);
+            }
+            else {
+                outgoingStatusComboBox.setSelectedIndex(2);
+            }
+        }
+        outgoingStatusComboBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                if (outgoingStatusComboBox.getSelectedIndex() != -1) {
+                    String data = outgoingStatusComboBox.getItemAt(outgoingStatusComboBox.getSelectedIndex());
+                    if (data.equals("Allow")) {
+                        ufwShellCommand.setDefaultRule("outgoing", "allow");
+                    }
+                    if (data.equals("Deny")) {
+                        ufwShellCommand.setDefaultRule("outgoing", "deny");
+                    }
+                    if (data.equals("Reject")) {
+                        ufwShellCommand.setDefaultRule("outgoing", "reject");
+                    }
+                }
+            }
+        });
+          
         this.add(incomeStatusComboBox);
         this.add(outgoingStatusComboBox);
 
@@ -123,24 +220,27 @@ public class MyFirewall extends JFrame implements ActionListener {
 
         this.setVisible(true);
         this.setLocationRelativeTo(null);
+
+        if(!isUfwActive) {
+            incomeStatusComboBox.setEnabled(false);
+            outgoingStatusComboBox.setEnabled(false);
+            addRuleBtn.setEnabled(false);
+            removeButton.setEnabled(false);
+            removeAllButton.setEnabled(false);
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        String element = e.getActionCommand();
-        if (element.equals("Add")) {
+        String action = e.getActionCommand();
+        if (action.equals("Add")) {
             new AddRule();
         }
-        if (element.equals("statusComboBox")) {
-            if (statusComboBox.getSelectedIndex() != -1) {
-                String data = statusComboBox.getItemAt(statusComboBox.getSelectedIndex());
-                if (data == "On") {
-                    ufwShellCommand.enableFireWall();
-                }
-                if (data == "Off") {
-                    ufwShellCommand.disabelFireWall();
-                }
-            }
+        if (action.equals("Remove")) {
+
+        }
+        if (action.equals("RemoveAll")) {
+
         }
     }
 }
