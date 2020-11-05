@@ -71,20 +71,19 @@ public class MyFirewall extends JFrame implements ActionListener {
         }
 
         JLabel fwLabel = new JLabel("Firewall");
-        fwLabel.setFont(new Font("TimesRoman", Font.BOLD, 20));
+        fwLabel.setFont(new Font("Serif", Font.BOLD, 20));
         fwLabel.setBounds(20, 20, 100, 30);
         this.add(fwLabel);
 
         JLabel statusLabel = new JLabel("Status: ");
-        statusLabel.setFont(new Font("TimesRoman", Font.BOLD, 16));
+        statusLabel.setFont(new Font("Serif", Font.BOLD, 16));
         statusLabel.setBounds(20, 60, 100, 30);
         this.add(statusLabel);
 
         String[] s1 = { "On", "Off" };
         statusComboBox = new JComboBox<String>(s1);
-        statusComboBox.setFont(new Font("TimesRoman", Font.PLAIN, 14));
+        statusComboBox.setFont(new Font("Serif", Font.PLAIN, 14));
         statusComboBox.setBounds(130, 60, 100, 30);
-        statusComboBox.addActionListener(this);
         if (isUfwActive) {
             statusComboBox.setSelectedIndex(0);
         } else {
@@ -118,15 +117,14 @@ public class MyFirewall extends JFrame implements ActionListener {
         });
 
         JLabel incomeLabel = new JLabel("Incoming: ");
-        incomeLabel.setFont(new Font("TimesRoman", Font.BOLD, 16));
+        incomeLabel.setFont(new Font("Serif", Font.BOLD, 16));
         incomeLabel.setBounds(20, 100, 100, 30);
         this.add(incomeLabel);
 
         String[] s2 = { "Allow", "Deny", "Reject" };
         incomeStatusComboBox = new JComboBox<String>(s2);
-        incomeStatusComboBox.setFont(new Font("TimesRoman", Font.PLAIN, 14));
+        incomeStatusComboBox.setFont(new Font("Serif", Font.PLAIN, 14));
         incomeStatusComboBox.setBounds(130, 100, 100, 30);
-        incomeStatusComboBox.addActionListener(this);
         if (incomePolicy.equals("allow")) {
             incomeStatusComboBox.setSelectedIndex(0);
         } else {
@@ -155,14 +153,13 @@ public class MyFirewall extends JFrame implements ActionListener {
         this.add(incomeStatusComboBox);
 
         JLabel outgoingLabel = new JLabel("Outgoing: ");
-        outgoingLabel.setFont(new Font("TimesRoman", Font.BOLD, 16));
+        outgoingLabel.setFont(new Font("Serif", Font.BOLD, 16));
         outgoingLabel.setBounds(20, 140, 100, 30);
         this.add(outgoingLabel);
 
         outgoingStatusComboBox = new JComboBox<String>(s2);
-        outgoingStatusComboBox.setFont(new Font("TimesRoman", Font.PLAIN, 14));
+        outgoingStatusComboBox.setFont(new Font("Serif", Font.PLAIN, 14));
         outgoingStatusComboBox.setBounds(130, 140, 100, 30);
-        outgoingStatusComboBox.addActionListener(this);
         if (outgoingPolicy.equals("allow")) {
             outgoingStatusComboBox.setSelectedIndex(0);
         } else {
@@ -193,7 +190,7 @@ public class MyFirewall extends JFrame implements ActionListener {
         this.add(outgoingStatusComboBox);
 
         JLabel ruleLabel = new JLabel("Rule");
-        ruleLabel.setFont(new Font("TimesRoman", Font.BOLD, 20));
+        ruleLabel.setFont(new Font("Serif", Font.BOLD, 20));
         ruleLabel.setBounds(20, 200, 100, 30);
         this.add(ruleLabel);
 
