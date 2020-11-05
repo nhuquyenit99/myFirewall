@@ -1,4 +1,7 @@
 import java.io.*;
+import java.util.*;
+
+import javax.swing.*;
 
 public class UFWShellCommand {
     String rootPassword;
@@ -25,6 +28,8 @@ public class UFWShellCommand {
             String status = line.split(": ")[1];
             return status;
         } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Something went wrong!", "Warning", JOptionPane.WARNING_MESSAGE);
+            e.printStackTrace();
             return "";
         }
     }
@@ -45,15 +50,72 @@ public class UFWShellCommand {
             String[] words = line.split("[: (),]");
             defaultRules[0] = words[2];
             defaultRules[1] = words[7];
+            return defaultRules;
         } catch (IOException e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Something went wrong!", "Warning", JOptionPane.WARNING_MESSAGE);
+            String[] empty = {};
+            return empty;
         }
-
-        return defaultRules;
     }
 
     public void setDefaultRule(String direction, String policy) {
         command("sudo ufw default " + policy + " " + direction);
+    }
+
+    public String[][] getRules() {
+        ArrayList<String[]> rules = new ArrayList<String[]>();
+        try {
+            Process pb = Runtime.getRuntime().exec("sudo ufw status");
+
+            BufferedReader input = new BufferedReader(new InputStreamReader(pb.getInputStream()));
+            String line;
+            int i = 0;
+            while ((line = input.readLine()) != null) {
+                if (i > 3) {
+                    System.out.println("line" + i + ": " + line);
+                    while (line.indexOf("   ") != -1) {
+                        line = line.replaceAll("   ", "  ");
+                    }
+                    String[] rule = line.trim().split("  ");
+                    
+                    if (rule.length == 3) {
+                        rules.add(rule);
+                    }
+                    
+                }
+                i++;
+            }
+            if (rules.size() == 0) {
+                String[][] empty = {};
+                return empty;
+            }
+            for (String[] rule: rules) {
+                for (String element: rule)
+                    System.out.println(element);
+            }
+            String[][] convertedRules = new String[rules.size()][3];
+            for(int j = 0; j < rules.size(); j ++) {
+                for(int l = 0; l < 3; l ++) {
+                    convertedRules[j][l] = rules.get(j)[l];
+                }
+            }
+            return convertedRules;
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Something went wrong!", "Warning", JOptionPane.WARNING_MESSAGE);
+            e.printStackTrace();
+            String[][] empty = {};
+            return empty;
+        }
+    }
+
+    public void deleteRule(int ruleIndex) {
+        command("sudo ufw --force delete " + ruleIndex);
+    }
+
+    public void deleteAllRules() {
+        command("sudo ufw --force reset");
+        enableFireWall();
     }
 
     public void command(String command) {
@@ -67,6 +129,7 @@ public class UFWShellCommand {
             }
             pb.destroy();
         } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Something went wrong!", "Warning", JOptionPane.WARNING_MESSAGE);
             e.printStackTrace();
         }
     }

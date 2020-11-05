@@ -3,10 +3,11 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class AddRule extends JFrame{
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
+    JComboBox policy;
+    JComboBox direction;
+    JComboBox protocol;
+    JComboBox port;
 
     public AddRule() {
         this.setTitle("Add rule");
@@ -22,14 +23,11 @@ public class AddRule extends JFrame{
         tabbedPane.setBounds(20, 70, 550, 200);
         JPanel panel1 = new JPanel();
         JPanel panel2 = new JPanel();
-        JPanel panel3 = new JPanel();
         panel1.setLayout(null);
         panel2.setLayout(null);
-        panel3.setLayout(null);
 
         tabbedPane.addTab("Simple", panel1);
-        tabbedPane.addTab("Preconfigured", panel2);
-        tabbedPane.addTab("Advanced", panel3);
+        tabbedPane.addTab("Advanced", panel2);
         this.add(tabbedPane);
 
         JButton addRuleBtn = new JButton("Add");

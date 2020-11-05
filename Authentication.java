@@ -42,6 +42,8 @@ public class Authentication extends JFrame {
                     }
                 } catch (IOException error) {
                     error.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Something went wrong!", "Warning", JOptionPane.WARNING_MESSAGE);
+                    // setVisible(false);
                 }
             }
         });

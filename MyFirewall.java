@@ -1,6 +1,9 @@
 import java.io.*;
+import java.util.*;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
 import java.awt.*;
 import java.awt.image.*;
 import java.awt.event.*;
@@ -12,13 +15,15 @@ public class MyFirewall extends JFrame implements ActionListener {
     JComboBox<String> statusComboBox;
     JComboBox<String> incomeStatusComboBox;
     JComboBox<String> outgoingStatusComboBox;
-    String[] rules;
+    String[][] rules;
     boolean isUfwActive;
     String incomePolicy;
     String outgoingPolicy;
     JButton addRuleBtn;
     JButton removeButton;
     JButton removeAllButton;
+    JTable table;
+    DefaultTableModel tableModel;
     /**
      *
      */
@@ -35,17 +40,18 @@ public class MyFirewall extends JFrame implements ActionListener {
             isUfwActive = true;
             String[] str = ufwShellCommand.getDefaultRules();
             System.out.println(str[0] + str[1]);
-            incomePolicy=str[0];
-            outgoingPolicy=str[1];
+            incomePolicy = str[0];
+            outgoingPolicy = str[1];
         } else {
             ufwShellCommand.enableFireWall();
             String[] str = ufwShellCommand.getDefaultRules();
             System.out.println(str[0] + str[1]);
-            incomePolicy=str[0];
-            outgoingPolicy=str[1];
+            incomePolicy = str[0];
+            outgoingPolicy = str[1];
             ufwShellCommand.disabelFireWall();
             isUfwActive = false;
         }
+        rules = ufwShellCommand.getRules();
         this.GUI();
     }
 
@@ -126,8 +132,7 @@ public class MyFirewall extends JFrame implements ActionListener {
         } else {
             if (incomePolicy.equals("deny")) {
                 incomeStatusComboBox.setSelectedIndex(1);
-            }
-            else {
+            } else {
                 incomeStatusComboBox.setSelectedIndex(2);
             }
         }
@@ -163,8 +168,7 @@ public class MyFirewall extends JFrame implements ActionListener {
         } else {
             if (outgoingPolicy.equals("deny")) {
                 outgoingStatusComboBox.setSelectedIndex(1);
-            }
-            else {
+            } else {
                 outgoingStatusComboBox.setSelectedIndex(2);
             }
         }
@@ -184,7 +188,7 @@ public class MyFirewall extends JFrame implements ActionListener {
                 }
             }
         });
-          
+
         this.add(incomeStatusComboBox);
         this.add(outgoingStatusComboBox);
 
@@ -194,10 +198,9 @@ public class MyFirewall extends JFrame implements ActionListener {
         this.add(ruleLabel);
 
         String[] columnNames = { "To", "Action", "From" };
-        // String[][] data = { { "51413/tcp", "ALLOW IN", "anywhere" }, { "51413/tcp",
-        // "ALLOW IN", "anywhere" } };
-        String[][] data = {};
-        JTable table = new JTable(data, columnNames);
+        tableModel = new DefaultTableModel(rules, columnNames);
+        table = new JTable(tableModel);
+        table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION); 
         JScrollPane sp = new JScrollPane(table);
         sp.setBounds(20, 240, 550, 200);
         this.add(sp);
@@ -221,7 +224,7 @@ public class MyFirewall extends JFrame implements ActionListener {
         this.setVisible(true);
         this.setLocationRelativeTo(null);
 
-        if(!isUfwActive) {
+        if (!isUfwActive) {
             incomeStatusComboBox.setEnabled(false);
             outgoingStatusComboBox.setEnabled(false);
             addRuleBtn.setEnabled(false);
@@ -237,10 +240,16 @@ public class MyFirewall extends JFrame implements ActionListener {
             new AddRule();
         }
         if (action.equals("Remove")) {
-
+            int row = table.getSelectedRow();
+            if (row != -1) { 
+                System.out.println("row selected: " + row);
+                tableModel.removeRow(row);
+                ufwShellCommand.deleteRule(row + 1);
+               }
         }
-        if (action.equals("RemoveAll")) {
-
+        if (action.equals("Remove all")) {
+            tableModel.setRowCount(0);
+            ufwShellCommand.deleteAllRules();
         }
     }
 }
