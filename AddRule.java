@@ -1,12 +1,13 @@
 import javax.swing.*;
-import javax.swing.text.NumberFormatter;
+import javax.swing.table.DefaultTableModel;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.text.NumberFormat;
 
 public class AddRule extends JFrame{
     private static final long serialVersionUID = 1L;
+    UFWShellCommand ufwShellCommand;
+
     JComboBox<String> simplePolicy;
     JComboBox<String> simpleDirection;
     JComboBox<String> simpleProtocol;
@@ -18,9 +19,10 @@ public class AddRule extends JFrame{
     JTextField advancedPort;
     JSpinner numberInsert;
 
-    public AddRule() {
+    public AddRule(UFWShellCommand ufwShellCommand, JTable table) {
+        this.ufwShellCommand = ufwShellCommand;
         this.setTitle("Add rule");
-        this.setSize(600, 600);
+        this.setSize(600, 550);
         this.setDefaultCloseOperation(3);
         this.setLayout(null);
         JLabel addRuleLabel = new JLabel("Add a new rule");
@@ -141,6 +143,30 @@ public class AddRule extends JFrame{
 
         JButton addRuleBtn = new JButton("Add");
         addRuleBtn.setBounds(20, 500, 100, 30);
+        addRuleBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed (ActionEvent e) {
+                int selectedIndex = tabbedPane.getSelectedIndex();
+                if (selectedIndex == 0) {
+                    String port = simplePort.getText();
+                    String policy = simplePolicy.getItemAt(simplePolicy.getSelectedIndex());
+                    String direction = simpleDirection.getItemAt(simpleDirection.getSelectedIndex());
+                    String protocol = simpleProtocol.getItemAt(simpleProtocol.getSelectedIndex());
+                    if (port.equals("")) {
+                        JOptionPane.showMessageDialog(null, "Please enter the port!", "Warning", JOptionPane.WARNING_MESSAGE);
+                    } else {
+                        ufwShellCommand.addSimpleRule(policy, direction, protocol, port);
+                        setVisible(false);
+                        String[][] rules = ufwShellCommand.getRules();
+                        String[] columnNames = { "To", "Action", "From" };
+                        DefaultTableModel tableModel = new DefaultTableModel(rules, columnNames);
+                        table.setModel(tableModel);
+                        // new MyFirewall(ufwShellCommand.getPassword());
+                    }
+                    System.out.println("simple rule" + policy + direction + protocol + port);
+                }
+            }
+        });
 
         JButton cancelButton = new JButton("Cancel");
         cancelButton.setBounds(150, 500, 100, 30);

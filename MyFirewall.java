@@ -234,7 +234,7 @@ public class MyFirewall extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         String action = e.getActionCommand();
         if (action.equals("Add")) {
-            new AddRule();
+            new AddRule(ufwShellCommand, table);
         }
         if (action.equals("Remove")) {
             int row = table.getSelectedRow();

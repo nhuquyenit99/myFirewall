@@ -10,6 +10,9 @@ public class UFWShellCommand {
         this.rootPassword = password;
     }
 
+    public String getPassword () {
+        return rootPassword;
+    }
     public void enableFireWall() {
         command("sudo ufw enable");
     }
@@ -116,6 +119,20 @@ public class UFWShellCommand {
     public void deleteAllRules() {
         command("sudo ufw --force reset");
         enableFireWall();
+    }
+
+    public void addSimpleRule (String policy, String direction, String protocol, String port) {
+        String protocolString = ""; 
+        if (!protocol.equals("Both")) {
+            protocolString += " proto " + protocol.toLowerCase();
+        }
+        if (direction.equals("Both")) {
+            command("sudo ufw " + policy.toLowerCase() + " in to any port " + port + protocolString);
+            command("sudo ufw " + policy.toLowerCase() + " out to any port " + port + protocolString);
+        } else {
+            System.out.println("command" + "sudo ufw " + policy.toLowerCase() + " " + direction.toLowerCase() + " to any port " + port + protocolString);
+            command("sudo ufw " + policy.toLowerCase() + " " + direction.toLowerCase() + " to any port " + port + protocolString);
+        }
     }
 
     public void command(String command) {
