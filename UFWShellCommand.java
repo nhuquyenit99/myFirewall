@@ -10,9 +10,10 @@ public class UFWShellCommand {
         this.rootPassword = password;
     }
 
-    public String getPassword () {
+    public String getPassword() {
         return rootPassword;
     }
+
     public void enableFireWall() {
         command("sudo ufw enable");
     }
@@ -49,7 +50,6 @@ public class UFWShellCommand {
             while ((line = input.readLine()) != null && i < 2) {
                 i++;
             }
-            System.out.println("default: " + line);
             String[] words = line.split("[: (),]");
             defaultRules[0] = words[2];
             defaultRules[1] = words[7];
@@ -81,11 +81,11 @@ public class UFWShellCommand {
                         line = line.replaceAll("   ", "  ");
                     }
                     String[] rule = line.trim().split("  ");
-                    
+
                     if (rule.length == 3) {
                         rules.add(rule);
                     }
-                    
+
                 }
                 i++;
             }
@@ -93,13 +93,13 @@ public class UFWShellCommand {
                 String[][] empty = {};
                 return empty;
             }
-            for (String[] rule: rules) {
-                for (String element: rule)
-                    System.out.println(element);
-            }
+            // for (String[] rule : rules) {
+            //     for (String element : rule)
+            //         System.out.println(element);
+            // }
             String[][] convertedRules = new String[rules.size()][3];
-            for(int j = 0; j < rules.size(); j ++) {
-                for(int l = 0; l < 3; l ++) {
+            for (int j = 0; j < rules.size(); j++) {
+                for (int l = 0; l < 3; l++) {
                     convertedRules[j][l] = rules.get(j)[l];
                 }
             }
@@ -121,8 +121,8 @@ public class UFWShellCommand {
         enableFireWall();
     }
 
-    public void addSimpleRule (String policy, String direction, String protocol, String port) {
-        String protocolString = ""; 
+    public void addSimpleRule(String policy, String direction, String protocol, String port) {
+        String protocolString = "";
         if (!protocol.equals("Both")) {
             protocolString += " proto " + protocol.toLowerCase();
         }
@@ -130,8 +130,8 @@ public class UFWShellCommand {
             command("sudo ufw " + policy.toLowerCase() + " in to any port " + port + protocolString);
             command("sudo ufw " + policy.toLowerCase() + " out to any port " + port + protocolString);
         } else {
-            System.out.println("command" + "sudo ufw " + policy.toLowerCase() + " " + direction.toLowerCase() + " to any port " + port + protocolString);
-            command("sudo ufw " + policy.toLowerCase() + " " + direction.toLowerCase() + " to any port " + port + protocolString);
+            command("sudo ufw " + policy.toLowerCase() + " " + direction.toLowerCase() + " to any port " + port
+                    + protocolString);
         }
     }
 
