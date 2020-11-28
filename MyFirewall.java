@@ -1,5 +1,4 @@
 import java.io.*;
-import java.util.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -197,7 +196,7 @@ public class MyFirewall extends JFrame implements ActionListener {
         String[] columnNames = { "To", "Action", "From" };
         tableModel = new DefaultTableModel(rules, columnNames);
         table = new JTable(tableModel);
-        table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION); 
+        table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         JScrollPane sp = new JScrollPane(table);
         sp.setBounds(20, 240, 550, 200);
         this.add(sp);
@@ -234,19 +233,24 @@ public class MyFirewall extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         String action = e.getActionCommand();
         if (action.equals("Add")) {
-            new AddRule(ufwShellCommand, table);
+            new AddRule(ufwShellCommand, table, tableModel);
         }
         if (action.equals("Remove")) {
             int row = table.getSelectedRow();
-            if (row != -1) { 
+            if (row != -1) {
                 System.out.println("row selected: " + row);
                 tableModel.removeRow(row);
-                ufwShellCommand.deleteRule(row + 1);
-               }
+                ufwShellCommand.command("sudo ufw --force delete " + (row + 1));
+                JOptionPane.showMessageDialog(null, "Selected rule deleted successfully");
+            }
         }
         if (action.equals("Remove all")) {
-            tableModel.setRowCount(0);
+            // tableModel.setRowCount(0);
+            while (tableModel.getRowCount() > 0) {
+                tableModel.removeRow(0);
+            }
             ufwShellCommand.deleteAllRules();
+            JOptionPane.showMessageDialog(null, "Remove all rules successfully");
         }
     }
 }

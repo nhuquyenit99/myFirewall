@@ -25,7 +25,7 @@ public class AddRule extends JFrame{
     JTextField toIp;
     JTextField toPort;
 
-    public AddRule(UFWShellCommand ufwShellCommand, JTable table) {
+    public AddRule(UFWShellCommand ufwShellCommand, JTable table, DefaultTableModel tableModel) {
         this.ufwShellCommand = ufwShellCommand;
         this.setTitle("Add rule");
         this.setSize(600, 600);
@@ -230,7 +230,8 @@ public class AddRule extends JFrame{
                         setVisible(false);
                         String[][] rules = ufwShellCommand.getRules();
                         String[] columnNames = { "To", "Action", "From" };
-                        DefaultTableModel tableModel = new DefaultTableModel(rules, columnNames);
+                        // DefaultTableModel model = new DefaultTableModel(rules, );
+                        tableModel.setDataVector(rules, columnNames);
                         table.setModel(tableModel);
                         // new MyFirewall(ufwShellCommand.getPassword());
                     }

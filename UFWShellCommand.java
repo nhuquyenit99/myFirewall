@@ -69,7 +69,7 @@ public class UFWShellCommand {
     public String[][] getRules() {
         ArrayList<String[]> rules = new ArrayList<String[]>();
         try {
-            Process pb = Runtime.getRuntime().exec("sudo ufw status");
+            Process pb = Runtime.getRuntime().exec("sudo ufw status numbered");
 
             BufferedReader input = new BufferedReader(new InputStreamReader(pb.getInputStream()));
             String line;
@@ -82,8 +82,12 @@ public class UFWShellCommand {
                     }
                     String[] rule = line.trim().split("  ");
 
-                    if (rule.length == 3) {
-                        rules.add(rule);
+                    if (rule.length >= 3) {
+                        String[] temp = new String[3];
+                        for(int j=0; j<3; j++) {
+                            temp[j] = rule[j];
+                        }
+                        rules.add(temp);
                     }
 
                 }
