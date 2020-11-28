@@ -240,12 +240,11 @@ public class MyFirewall extends JFrame implements ActionListener {
             if (row != -1) {
                 System.out.println("row selected: " + row);
                 tableModel.removeRow(row);
-                ufwShellCommand.command("sudo ufw --force delete " + (row + 1));
+                ufwShellCommand.deleteRule(row + 1);
                 JOptionPane.showMessageDialog(null, "Selected rule deleted successfully");
             }
         }
         if (action.equals("Remove all")) {
-            // tableModel.setRowCount(0);
             while (tableModel.getRowCount() > 0) {
                 tableModel.removeRow(0);
             }

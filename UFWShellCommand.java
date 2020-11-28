@@ -139,12 +139,64 @@ public class UFWShellCommand {
         }
     }
 
+    public void addAdvancedRule(int numberInsert, String policy, String direction, String protocol, String itf,
+    String ipFrom, String portFrom, String ipTo, String portTo) {
+        String numberInsertString = "";
+        if (numberInsert != 0) {
+            numberInsertString += " insert " + numberInsert;
+        }
+        String protocolString = "";
+        if (!protocol.equals("Both")) {
+            protocolString += " proto " + protocol.toLowerCase();
+        }
+        String interfaceString = "";
+        if (!itf.equals("All interfaces")) {
+            interfaceString += " on " + itf;
+        }
+        String fromString = "";
+        if (!ipFrom.equals("") || !portFrom.equals("")) {
+            fromString += " from ";
+            if (ipFrom.equals("")) {
+                fromString += "any";
+            } else {
+                fromString += ipFrom;
+            }
+            if (!portFrom.equals("")) {
+                fromString += " port " + portFrom;
+            }
+        }
+        String toString = "";
+        if (!ipTo.equals("") || !portTo.equals("")) {
+            toString += " to ";
+            if (ipTo.equals("")) {
+                toString += "any";
+            } else {
+                toString += ipTo;
+            }
+            if (!portTo.equals("")) {
+                toString += " port " + portTo;
+            }
+        }
+        if (direction.equals("Both")) {
+            command("sudo ufw" + numberInsertString + " " + policy.toLowerCase() + " in" + interfaceString + fromString + 
+                toString + protocolString);
+            command("sudo ufw" + numberInsertString + " " + policy.toLowerCase() + " out" + interfaceString + fromString + 
+                toString + protocolString);
+        } else {
+            command("sudo ufw" + numberInsertString + " " + policy.toLowerCase() + " " + direction.toLowerCase() + interfaceString + 
+                fromString + toString + protocolString);
+        }
+    }
+
     public void command(String command) {
         try {
             Process pb = Runtime.getRuntime().exec(command);
 
             String line;
             BufferedReader input = new BufferedReader(new InputStreamReader(pb.getInputStream()));
+            if (input.readLine() == null) {
+                JOptionPane.showMessageDialog(null, "Command ERROR!", "Warning", JOptionPane.WARNING_MESSAGE);
+            }
             while ((line = input.readLine()) != null) {
                 System.out.println(line);
             }

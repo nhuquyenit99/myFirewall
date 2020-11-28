@@ -6,7 +6,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
 
-public class AddRule extends JFrame{
+public class AddRule extends JFrame {
     private static final long serialVersionUID = 1L;
     UFWShellCommand ufwShellCommand;
 
@@ -61,7 +61,7 @@ public class AddRule extends JFrame{
         directionLabel.setBounds(20, 50, 100, 30);
         panel1.add(directionLabel);
 
-        String[] s2 = { "Both", "In", "Out"};
+        String[] s2 = { "Both", "In", "Out" };
         simpleDirection = new JComboBox<String>(s2);
         simpleDirection.setFont(new Font("Serif", Font.PLAIN, 12));
         simpleDirection.setBounds(120, 50, 380, 30);
@@ -87,8 +87,8 @@ public class AddRule extends JFrame{
         simplePort.setFont(new Font("Serif", Font.PLAIN, 12));
         simplePort.setToolTipText("You can write a port as \"22\" or a range port as \"22:40\" or service as \"http\"");
         simplePort.setBounds(120, 130, 380, 30);
-        panel1.add(simplePort);  
-        
+        panel1.add(simplePort);
+
         tabbedPane.addTab("Advanced", panel2);
 
         JLabel insertLabel = new JLabel("Insert: ");
@@ -139,23 +139,11 @@ public class AddRule extends JFrame{
         advancedPortLabel.setBounds(20, 170, 100, 30);
         panel2.add(advancedPortLabel);
 
-        String[] interfaceString = getInterfaces();  
+        String[] interfaceString = getInterfaces();
 
         interfaces = new JComboBox<String>(interfaceString);
         interfaces.setFont(new Font("Serif", Font.PLAIN, 12));
         interfaces.setBounds(120, 170, 380, 30);
-        panel2.add(interfaces);
-
-        JLabel logLabel = new JLabel("Log: ");
-        logLabel.setFont(new Font("Serif", Font.BOLD, 12));
-        logLabel.setBounds(20, 210, 100, 30);
-        panel2.add(logLabel);
-
-        String[] logString = {"Do not log", "Log", "Log all"};  
-
-        interfaces = new JComboBox<String>(logString);
-        interfaces.setFont(new Font("Serif", Font.PLAIN, 12));
-        interfaces.setBounds(120, 210, 380, 30);
         panel2.add(interfaces);
 
         JLabel fromLabel = new JLabel("From: ");
@@ -171,7 +159,7 @@ public class AddRule extends JFrame{
         fromIp = new JTextField();
         fromIp.setFont(new Font("Serif", Font.PLAIN, 12));
         fromIp.setBounds(120, 250, 150, 30);
-        panel2.add(fromIp);  
+        panel2.add(fromIp);
 
         JLabel fromPortLabel = new JLabel("Port/Service ");
         fromPortLabel.setFont(new Font("Serif", Font.BOLD, 12));
@@ -182,8 +170,8 @@ public class AddRule extends JFrame{
         fromPort.setFont(new Font("Serif", Font.PLAIN, 12));
         fromPort.setToolTipText("You can write a port as \"22\" or a range port as \"22:40\" or service as \"http\"");
         fromPort.setBounds(380, 250, 120, 30);
-        panel2.add(fromPort); 
-        
+        panel2.add(fromPort);
+
         JLabel toLabel = new JLabel("To: ");
         toLabel.setFont(new Font("Serif", Font.BOLD, 12));
         toLabel.setBounds(20, 290, 50, 30);
@@ -197,7 +185,7 @@ public class AddRule extends JFrame{
         toIp = new JTextField();
         toIp.setFont(new Font("Serif", Font.PLAIN, 12));
         toIp.setBounds(120, 290, 150, 30);
-        panel2.add(toIp);  
+        panel2.add(toIp);
 
         JLabel toPortLabel = new JLabel("Port/Service ");
         toPortLabel.setFont(new Font("Serif", Font.BOLD, 12));
@@ -208,7 +196,7 @@ public class AddRule extends JFrame{
         toPort.setFont(new Font("Serif", Font.PLAIN, 12));
         toPort.setToolTipText("You can write a port as \"22\" or a range port as \"22:40\" or service as \"http\"");
         toPort.setBounds(380, 290, 120, 30);
-        panel2.add(toPort); 
+        panel2.add(toPort);
 
         this.add(tabbedPane);
 
@@ -216,7 +204,7 @@ public class AddRule extends JFrame{
         addRuleBtn.setBounds(20, 500, 100, 30);
         addRuleBtn.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed (ActionEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 int selectedIndex = tabbedPane.getSelectedIndex();
                 if (selectedIndex == 0) {
                     String port = simplePort.getText();
@@ -224,18 +212,39 @@ public class AddRule extends JFrame{
                     String direction = simpleDirection.getItemAt(simpleDirection.getSelectedIndex());
                     String protocol = simpleProtocol.getItemAt(simpleProtocol.getSelectedIndex());
                     if (port.equals("")) {
-                        JOptionPane.showMessageDialog(null, "Please enter the port!", "Warning", JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Please enter the port!", "Warning",
+                                JOptionPane.WARNING_MESSAGE);
                     } else {
                         ufwShellCommand.addSimpleRule(policy, direction, protocol, port);
                         setVisible(false);
                         String[][] rules = ufwShellCommand.getRules();
                         String[] columnNames = { "To", "Action", "From" };
-                        // DefaultTableModel model = new DefaultTableModel(rules, );
                         tableModel.setDataVector(rules, columnNames);
                         table.setModel(tableModel);
-                        // new MyFirewall(ufwShellCommand.getPassword());
                     }
                     System.out.println("simple rule" + policy + direction + protocol + port);
+                } else {
+                    String ipFrom = fromIp.getText();
+                    String ipTo = toIp.getText();
+                    String portFrom = fromPort.getText();
+                    String portTo = toPort.getText();
+                    if (ipFrom.equals("") && ipTo.equals("") && portFrom.equals("") && portTo.equals("")) {
+                        JOptionPane.showMessageDialog(null, "Please enter the port or ip address!", "Warning",
+                                JOptionPane.WARNING_MESSAGE);
+                    } else {
+                        int insertNumber = (Integer) numberInsert.getValue();
+                        String policy = advancedPolicy.getItemAt(advancedPolicy.getSelectedIndex());
+                        String direction = advancedDirection.getItemAt(advancedDirection.getSelectedIndex());
+                        String protocol = advancedProtocol.getItemAt(advancedProtocol.getSelectedIndex());
+                        String itf = interfaces.getItemAt(interfaces.getSelectedIndex());
+                        ufwShellCommand.addAdvancedRule(insertNumber, policy, direction, protocol, itf, ipFrom,
+                                portFrom, ipTo, portTo);
+                        setVisible(false);
+                        String[][] rules = ufwShellCommand.getRules();
+                        String[] columnNames = { "To", "Action", "From" };
+                        tableModel.setDataVector(rules, columnNames);
+                        table.setModel(tableModel);
+                    }
                 }
             }
         });
@@ -244,7 +253,7 @@ public class AddRule extends JFrame{
         cancelButton.setBounds(150, 500, 100, 30);
         cancelButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed (ActionEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 setVisible(false);
             }
         });
